@@ -1,7 +1,7 @@
-# Playwright PHP
+<div align=center>
 
+Made in JavaScript – Unleashed in PHP 
 
-## Resources
+Late August 2025
 
-* https://playwright.dev/
-* https://github.com/microsoft/playwright
+</div>
