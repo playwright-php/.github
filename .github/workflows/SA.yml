@@ -11,9 +11,6 @@ on:
         type: string
         required: false
         default: 'analyse --no-progress --memory-limit=-1'
-    secrets:
-      GITHUB_TOKEN:
-        required: false
 
 jobs:
   sa:
