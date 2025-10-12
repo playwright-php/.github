@@ -1,0 +1,52 @@
+name: SA (Static Analysis)
+
+on:
+  workflow_call:
+    inputs:
+      php-version:
+        type: string
+        required: false
+        default: '8.4'
+      phpstan-args:
+        type: string
+        required: false
+        default: 'analyse --no-progress --memory-limit=-1'
+    secrets:
+      GITHUB_TOKEN:
+        required: false
+
+jobs:
+  sa:
+    name: "Static Analysis (PHP ${{ inputs.php-version }})"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Setup PHP ${{ inputs.php-version }}"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ inputs.php-version }}
+          coverage: none
+          tools: phpstan, composer
+
+      - name: "Cache Composer dependencies"
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: "Composer install"
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: "Run PHPStan"
+        run: |
+          if [ -x vendor/bin/phpstan ]; then
+            BIN=vendor/bin/phpstan
+          else
+            BIN=phpstan
+          fi
+          $BIN --version
+          $BIN ${{ inputs.phpstan-args }}
