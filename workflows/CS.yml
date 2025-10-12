@@ -1,0 +1,57 @@
+name: CS (Code Style)
+
+on:
+  workflow_call:
+    inputs:
+      php-version:
+        type: string
+        required: false
+        default: '8.4'
+      composer-validate:
+        type: boolean
+        required: false
+        default: true
+      php-cs-fixer-args:
+        type: string
+        required: false
+        default: '--diff --dry-run'
+
+jobs:
+  cs:
+    name: "Code Style (PHP ${{ inputs.php-version }})"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Setup PHP ${{ inputs.php-version }}"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ inputs.php-version }}
+          coverage: none
+          tools: php-cs-fixer, composer
+
+      - name: "Cache Composer dependencies"
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: "Composer validate"
+        if: inputs.composer-validate == true
+        run: composer validate --strict
+
+      - name: "Composer install"
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: "Run PHP-CS-Fixer"
+        run: |
+          if [ -x vendor/bin/php-cs-fixer ]; then
+            BIN=vendor/bin/php-cs-fixer
+          else
+            BIN=php-cs-fixer
+          fi
+          $BIN -V
+          $BIN fix ${{ inputs.php-cs-fixer-args }}
