@@ -1,0 +1,42 @@
+name: SEC (Security)
+
+on:
+  workflow_call:
+    inputs:
+      php-version:
+        type: string
+        required: false
+        default: '8.4'
+      composer-audit-args:
+        type: string
+        required: false
+        default: '--no-interaction'
+
+jobs:
+  sec:
+    name: "Security Audit (PHP ${{ inputs.php-version }})"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Setup PHP ${{ inputs.php-version }}"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ inputs.php-version }}
+          coverage: none
+          tools: composer
+
+      - name: "Cache Composer dependencies"
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: "Composer install"
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: "Composer audit"
+        run: composer audit ${{ inputs.composer-audit-args }}
