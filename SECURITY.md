@@ -16,4 +16,4 @@ We prefer all communications to be in English or French.
 
 ## Security Policy
 
-We follow the principle of [Coordinated Vulerability Disclosure](https://en.wikipedia.org/wiki/Coordinated_vulnerability_disclosure). 
+We follow the principle of [Coordinated Vulnerability Disclosure](https://en.wikipedia.org/wiki/Coordinated_vulnerability_disclosure). 
